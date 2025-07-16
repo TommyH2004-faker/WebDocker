@@ -22,11 +22,12 @@ services:
       retries: 5
 
   backend:
-    build: ./be/backend_web
+    build: ./be/be_web
     container_name: springboot-app
-    depends_on:
-      mysql:
-        condition: service_healthy
+    volumes:
+      - ./be/be_web:/app     # mount source code vào container
+    working_dir: /app             # đảm bảo đúng nơi chạy code
+    command: ./mvnw spring-boot:run   # chạy trực tiếp bằng mvn
     ports:
       - "8080:8080"
     environment:
@@ -34,15 +35,24 @@ services:
       SPRING_DATASOURCE_USERNAME: spring_04
       SPRING_DATASOURCE_PASSWORD: spring04
     restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+
 
   frontend:
     build: ./fe/frontend_web
     container_name: react-app
+    volumes:
+      - ./fe/frontend_web:/usr/src/app
+    working_dir: /usr/src/app
+    command: npm start
+    ports:
+      - "3000:3000"
+    restart: always
     depends_on:
       - backend
-    ports:
-      - "3000:80"
-    restart: always
+
 
 volumes:
   mysql_data:
