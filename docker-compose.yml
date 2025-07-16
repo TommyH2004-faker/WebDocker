@@ -1,0 +1,48 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-db
+    ports:
+      - "3308:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: websitenhua
+      MYSQL_USER: spring_04
+      MYSQL_PASSWORD: spring04
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./full-backup.sql:/docker-entrypoint-initdb.d/full-backup.sql
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./be/backend_web
+    container_name: springboot-app
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/websitenhua
+      SPRING_DATASOURCE_USERNAME: spring_04
+      SPRING_DATASOURCE_PASSWORD: spring04
+    restart: always
+
+  frontend:
+    build: ./fe/frontend_web
+    container_name: react-app
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    restart: always
+
+volumes:
+  mysql_data:

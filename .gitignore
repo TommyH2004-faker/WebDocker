@@ -1,0 +1,29 @@
+# Node modules
+fe/frontend_web/node_modules/
+
+# Logs & caches
+*.log
+*.tmp
+.cache/
+dist/
+build/
+
+# IDEs & tools
+.vscode/
+.idea/
+*.iml
+
+# System
+.DS_Store
+Thumbs.db
+
+# Java
+*.class
+target/
+be/backend_web/target/
+
+# OS files
+*.swp
+
+# Others
+.env
